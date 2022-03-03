@@ -1,7 +1,7 @@
 [
     {
       "_id": "621df94a67ecd3385423f891",
-      "name": "Physics",
+      "name": "Science",
       "description": "World physic scientist",
       "photo": "no-photo.jpg",
       "averageRating": 8,
@@ -42,15 +42,6 @@
       "photo": "business.jpg",
       "averageRating": 10,
       "created_at": "2022-03-01T16:49:03.664Z",
-      "__v": 0
-    },
-    {
-      "_id": "621e4ea61c30586c24f38dab",
-      "name": "Business1",
-      "description": "How to be an enterpreneur",
-      "photo": "business.jpg",
-      "averageRating": 10,
-      "created_at": "2022-03-01T16:49:42.622Z",
       "__v": 0
     }
   ]

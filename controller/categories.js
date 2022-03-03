@@ -4,18 +4,34 @@ const asyncHandler = require('../middleware/asyncHandler');
 
 exports.getCategories = asyncHandler(async (req, res, next) => {
     console.log(req.query);
-    // const categories = await Category.find(req.query, 'name description');
     const select = req.query.select;
     const sort = req.query.sort;
-    delete req.query.select;
-    delete req.query.sort;
+    const page = parseInt(req.query.page) || 1; // if page didn't come default page is 1
+    const limit = parseInt(req.query.limit) || 5; // default documents in 1 page
+
+    ['select', 'sort', 'page', 'limit'].forEach(el => delete req.query[el]);
+
+    // Pagination
+    const total = await Category.countDocuments();
+    const pageCount = Math.ceil(total / limit);
+    const start = (page - 1) * limit + 1;
+    let end = start + limit -1;
+    if(end > total) end = total;
+    
+    const pagination = {total, pageCount, start, end, limit};
+
+    if(page < pageCount) pagination.nextPage = page + 1;
+    if(page > 1) pagination.previousPage = page - 1;
+
     console.log('req.query: ', req.query);
-    console.log('select: ', select);
-    console.log('sort: ', sort);
-    const categories = await Category.find(req.query, select).sort(sort);
+    // console.log('select: ', select);
+    // console.log('sort: ', sort);
+
+    const categories = await Category.find(req.query, select).sort(sort).skip(start - 1).limit(limit);
     res.status(200).json({
         success: 'true', 
-        data: categories
+        data: categories,
+        pagination
     });
 });
 

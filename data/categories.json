@@ -1,0 +1,56 @@
+[
+    {
+      "_id": "621df94a67ecd3385423f891",
+      "name": "Physics",
+      "description": "World physic scientist",
+      "photo": "no-photo.jpg",
+      "averageRating": 8,
+      "created_at": "2022-03-01T10:45:30.612Z",
+      "__v": 0
+    },
+    {
+      "_id": "621dfb696f0e2b189e036e4b",
+      "name": "Love and Romance",
+      "description": "Everthing about love",
+      "photo": "no-photo.jpg",
+      "averageRating": 8,
+      "created_at": "2022-03-01T10:54:33.573Z",
+      "__v": 0
+    },
+    {
+      "_id": "621e4e2c1c30586c24f38da5",
+      "name": "Programming",
+      "description": "Modern web programming and code beauty",
+      "photo": "no-photo.jpg",
+      "averageRating": 8,
+      "created_at": "2022-03-01T16:47:40.549Z",
+      "__v": 0
+    },
+    {
+      "_id": "621e4e451c30586c24f38da7",
+      "name": "Self care",
+      "description": "All about self development",
+      "photo": "no-photo.jpg",
+      "averageRating": 8,
+      "created_at": "2022-03-01T16:48:05.470Z",
+      "__v": 0
+    },
+    {
+      "_id": "621e4e7f1c30586c24f38da9",
+      "name": "Business",
+      "description": "How to be an enterpreneur",
+      "photo": "business.jpg",
+      "averageRating": 10,
+      "created_at": "2022-03-01T16:49:03.664Z",
+      "__v": 0
+    },
+    {
+      "_id": "621e4ea61c30586c24f38dab",
+      "name": "Business1",
+      "description": "How to be an enterpreneur",
+      "photo": "business.jpg",
+      "averageRating": 10,
+      "created_at": "2022-03-01T16:49:42.622Z",
+      "__v": 0
+    }
+  ]

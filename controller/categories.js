@@ -30,13 +30,14 @@ exports.getCategories = asyncHandler(async (req, res, next) => {
     const categories = await Category.find(req.query, select).sort(sort).skip(start - 1).limit(limit);
     res.status(200).json({
         success: 'true', 
+        count: categories.length,
         data: categories,
         pagination
     });
 });
 
 exports.getCategory = asyncHandler(async (req, res, next) => {
-    const category = await Category.findById(req.params.id);
+    const category = await Category.findById(req.params.id).populate('books');
     if (!category){
         // throw new custom error
         throw new MyError('Hey there is no data with this id ' + req.params.id, 400);
@@ -71,13 +72,17 @@ exports.updateCategory = asyncHandler( async (req, res, next) => {
 });
 
 exports.deleteCategory = asyncHandler( async (req, res, next) => {
-    const category = await Category.findByIdAndDelete(req.params.id);
+    const category = await Category.findById(req.params.id);
 
     // if category is null
     if(!category){
         // throw new custom error
         throw new MyError('There is no data with this id: ' + req.params.id, 400);
     }
+
+    // used for deleting related books, code is written in category model
+    category.remove();
+
     res.status(200).json({
         success: 'true',
         data: category

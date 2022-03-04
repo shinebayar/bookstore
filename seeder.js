@@ -15,7 +15,7 @@ const books = JSON.parse( fs.readFileSync(__dirname + '/data/books.json', 'utf-8
 const importData = async () => {
     try{
         await Category.create(categories);
-        await Book.create(books);
+        // await Book.create(books);
         console.log('Data imported ...'.green.inverse);
     }catch(err){
         console.log(err);

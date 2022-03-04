@@ -48,8 +48,31 @@ const BookSchema = new mongoose.Schema({
     }
 });
 
-BookSchema.pre('save', function(next){
-    next();
+BookSchema.statics.computeCategoryAveragePrice = async function(catId){
+    const book = await this.aggregate([
+        { $match: {category: catId} },
+        { $group: {_id: '$category', avgPrice:{$avg: '$price'}} }
+    ]);
+    // console.log('dddddddddddddddddddddddddddddddd: ', book);
+    // console.log('dddddddddddddddddddddddddddddddd: ', book[0].avgPrice);
+
+    let avgPrice = null;
+    if(book.length) { avgPrice = book[0].avgPrice; }
+
+    // model() ==> can access directly to different model
+    await this.model('Category').findByIdAndUpdate(catId, {
+        averagePrice: avgPrice
+    });
+
+    return book;
+}
+
+BookSchema.post('save', function(){
+    this.constructor.computeCategoryAveragePrice(this.category);
+});
+
+BookSchema.pre('remove'  , function(){   
+    this.constructor.computeCategoryAveragePrice(this.category);
 });
 
 module.exports = mongoose.model('Book', BookSchema);

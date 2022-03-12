@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const fs = require('fs');
 var rfs = require('rotating-file-stream')
+const fileUpload = require('express-fileupload');
 
 const morgan = require('morgan');
 const colors = require('colors');
@@ -10,6 +11,7 @@ const logger = require('./middleware/logger');
 const connectDB = require('./config/db');
 const categoriesRoutes = require('./routes/categories');
 const booksRoutes = require('./routes/books');
+const usersRoutes = require('./routes/users');
 const errorHandler = require('./middleware/error');
 
 // To load application config to process.env
@@ -32,10 +34,12 @@ var accessLogStream = rfs.createStream('access.log', {
 app.use(express.json());
 
 // Implementing middleware
+app.use(fileUpload());
 app.use(logger);
 app.use(morgan('combined', {stream: accessLogStream}));
 app.use('/api/v1/categories', categoriesRoutes);
 app.use('/api/v1/books', booksRoutes);
+app.use('/api/v1/users', usersRoutes);
 app.use(errorHandler);
 
 const server = app.listen(process.env.PORT, () => console.log(`Express server running in ${process.env.PORT} ...`.rainbow) );

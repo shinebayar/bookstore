@@ -1,22 +1,25 @@
 const errorHandler = (err, req, res, next) => {
-    console.log(err.stack.red);
-    console.log('=================');
-    console.log(err.name);
-
-    if(err.name === 'CastError'){ 
-        err.message = 'This is not valid ID structure';
-        err.statusCode = 400;
+    console.log(err.stack.cyan.underline);
+  
+    const error = { ...err };
+  
+    error.message = err.message;
+  
+    if (error.name === "CastError") {
+      error.message = "This id is not correct format.";
+      error.statusCode = 400;
     }
-
-    if(err.name === 'ValidationError'){ 
-        err.message = 'You should fill required fields';
-        err.statusCode = 400;
+  
+    if (error.code === 11000) {
+      error.message = "That field is must be unique!";
+      error.statusCode = 400;
     }
-
+  
     res.status(err.statusCode || 500).json({
-        success: false,
-        error: err
+      success: false,
+      error,
     });
-}
-
-module.exports = errorHandler;
+  };
+  
+  module.exports = errorHandler;
+  

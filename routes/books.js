@@ -1,10 +1,13 @@
 const express = require('express');
 
-const {getBooks, getBook, createBook, deleteBook, updateBook} = require('../controller/books');
+const { protect, authorize } = require('../middleware/protectEndpoint');
 
-const router = express.Router({mergeParams: true});
+const {getBooks, getBook, createBook, deleteBook, updateBook, uploadBookPhoto} = require('../controller/books');
 
-router.route('/').get(getBooks).post(createBook);
-router.route('/:id').get(getBook).delete(deleteBook).put(updateBook);
+const router = express.Router();
+                                    // run first protect middleware. Then run second authorize middleware. Then run createBook middleware
+router.route('/').get(getBooks).post(protect, authorize('admin', 'operator'), createBook);
+router.route('/:id').get(getBook).delete(protect, authorize('admin', 'operator'), deleteBook).put(protect, authorize('admin', 'operator'), updateBook);
+router.route('/:id/photo').put(protect, authorize('admin', 'operator'), uploadBookPhoto);
 
 module.exports = router;

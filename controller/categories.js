@@ -1,9 +1,12 @@
+const path = require('path');
+
 const Category = require('../models/Category');
 const MyError = require('../utils/myError');
 const asyncHandler = require('../middleware/asyncHandler');
+const paginate = require('../utils/paginate');
 
 exports.getCategories = asyncHandler(async (req, res, next) => {
-    console.log(req.query);
+    // console.log(req.query);
     const select = req.query.select;
     const sort = req.query.sort;
     const page = parseInt(req.query.page) || 1; // if page didn't come default page is 1
@@ -11,23 +14,13 @@ exports.getCategories = asyncHandler(async (req, res, next) => {
 
     ['select', 'sort', 'page', 'limit'].forEach(el => delete req.query[el]);
 
-    // Pagination
-    const total = await Category.countDocuments();
-    const pageCount = Math.ceil(total / limit);
-    const start = (page - 1) * limit + 1;
-    let end = start + limit -1;
-    if(end > total) end = total;
-    
-    const pagination = {total, pageCount, start, end, limit};
+    const pagination = await paginate(page, limit, Category);
 
-    if(page < pageCount) pagination.nextPage = page + 1;
-    if(page > 1) pagination.previousPage = page - 1;
-
-    console.log('req.query: ', req.query);
+    // console.log('req.query: ', req.query);
     // console.log('select: ', select);
     // console.log('sort: ', sort);
 
-    const categories = await Category.find(req.query, select).sort(sort).skip(start - 1).limit(limit);
+    const categories = await Category.find(req.query, select).sort(sort).skip(pagination.start - 1).limit(limit);
     res.status(200).json({
         success: 'true', 
         count: categories.length,
@@ -88,3 +81,25 @@ exports.deleteCategory = asyncHandler( async (req, res, next) => {
         data: category
     })
 });
+
+exports.uploadCategoryPhoto = asyncHandler( async (req, res, next) => {
+    const category = await Category.findById(req.params.id);
+    
+    const photo = req.files.photo;
+
+    if( ! photo.mimetype.startsWith('image') ) throw new MyError('Upload file must be image', 400);
+    
+    if( photo.size > process.env.MAX_UPLOAD_FILE_SIZE ) throw new MyError(`Upload image size is exceeded. It should be less than ${process.env.MAX_UPLOAD_FILE_SIZE} byte`, 400)
+
+    const photoName = `photo_${category._id}${path.parse(photo.name).ext}`;
+
+    photo.mv(`${process.env.UPLOAD_PHOTO_ROOT_PATH_CATEGORY}/${photoName}`);
+
+    category.photo = photoName;
+    category.save();
+
+    res.status(200).json({
+        success: true,
+        data: category
+    });
+} );

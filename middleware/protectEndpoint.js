@@ -11,7 +11,7 @@ exports.protect = asyncHandler( async(req, res, next) => {
     if( !token ) throw new MyError('There is no token', 400);
 
     const tokenObj = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('encoded jwt', tokenObj);
+    // console.log('encoded jwt', tokenObj);
 
     req.userId = tokenObj.id;
     req.role = tokenObj.role;

@@ -107,17 +107,26 @@ exports.createBook = asyncHandler( async(req, res, next) =>{
 } );
 
 exports.updateBook = asyncHandler( async (req, res, next) => {
-    // this data come from middleware
-    req.body.updatedUser = req.userId;
-
-    const book = await Book.findByIdAndUpdate(req.params.id, req.body, {
-        new: true, 
-        runValidators: true // check validaters on models/Book.js file
-    });
+    
+    let book = await Book.findById(req.params.id);
+    
     if(!book){ // when there is no ID, it returns null
         // throw custom error
         throw new MyError('There is no data with this id ' + req.params.id, 430);
     }
+
+    if( book.createdUser.toString() !== req.userId && req.role !== 'admin' ) throw new MyError('You can edit only your books', 403);
+    
+    
+    // this data come from middleware
+    req.body.updatedUser = req.userId;
+
+    for(let attr in req.body){
+        book[attr] = req.body[attr];
+    }
+
+    book.save();
+    
     res.status(200).json({
         success: 'true',
         data: book
@@ -129,6 +138,8 @@ exports.deleteBook = asyncHandler( async(req, res, next) =>{
     if(!book){
         throw new MyError('There is no data with id ' + req.params.id, 404);
     }
+
+    if( book.createdUser.toString() !== req.userId && req.role !== 'admin' ) throw new MyError('You can edit only your books', 403);
 
     // this below code can give a chance to delete related comments to that book
     book.remove();

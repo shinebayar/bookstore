@@ -2,13 +2,15 @@ const express = require('express');
 
 const { protect, authorize } = require('../middleware/protectEndpoint');
 
-const {registerUser, loginUser, getUsers, getUser, createUser, updateUser, deleteUser} = require('../controller/users');
+const {registerUser, loginUser, getUsers, getUser, createUser, updateUser, deleteUser, forgotPassword, resetPassword} = require('../controller/users');
 const { getUserBooks } = require('../controller/books');
 
 const router = express.Router();
 
 router.route('/login').post(loginUser);
 router.route('/register').post(registerUser);
+router.route('/forgot-password').post(forgotPassword);
+router.route('/reset-password').post(resetPassword);
 
 // Above routes use protect middleware.
 router.use(protect);

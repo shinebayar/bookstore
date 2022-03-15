@@ -1,9 +1,11 @@
 const path = require('path');
+const crypto = require('crypto');
 
 const User = require('../models/User');
 const MyError = require('../utils/myError');
 const asyncHandler = require('../middleware/asyncHandler');
 const paginate = require('../utils/paginate');
+const sendEmail = require('../utils/email');
 
 exports.registerUser = asyncHandler(async (req, res, next) => {
     const user = await User.create(req.body);
@@ -105,4 +107,60 @@ exports.deleteUser = asyncHandler( async (req, res, next) => {
         success: 'true',
         data: user
     })
+});
+
+exports.forgotPassword = asyncHandler(async (req, res, next) => {
+    if( !req.body.email ) throw new MyError('You should input your email to get password recovery link', 400);
+    const user = await User.findOne({email: req.body.email});
+
+    if (!user) throw new MyError('Hey there is no email:  ' + req.params.email, 400);
+
+    resetPasswordToken = user.generatePasswordChangeToken();
+    user.save({ validateBeforeSave: false });
+
+    // Send email
+    const link = `http://www.bookstore.mn/forget-password/${resetPasswordToken}`;
+    const message = `
+        <div>
+            Hello  <b> ${user.name} </b><br><br>
+            You have requested password reset on ${user.email} mail address on our online bookstore. <br><br>
+            Click link below to reset your password <br><br>
+            <a target="_blank" href="${link}">${link}</a> <br><br>
+            Have good day &#128536; .
+        </div>
+    `;
+    await sendEmail({
+        to: user.email,
+        subject: 'This is password recovery email from online bookstore',
+        message
+    });
+
+    res.status(200).json({
+        success: true,
+        resetPasswordToken,
+        data: user
+    });
+});
+
+exports.resetPassword = asyncHandler(async (req, res, next) => {
+    if( !req.body.resetToken || !req.body.password ) throw new MyError('You should pass token and password', 400);
+
+    const encrypted = crypto.createHash('sha256').update(req.body.resetToken).digest('hex');
+
+    const user = await User.findOne({ resetPasswordToken: encrypted, resetPasswordExpire: {$gt: Date.now()} });
+
+    if (!user) throw new MyError('Token is not valid', 400);
+
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save();
+
+    const token = user.getJsonWebToken();
+
+    res.status(200).json({
+        success: true,
+        token,
+        data: user
+    });
 });

@@ -1,0 +1,26 @@
+[
+    {
+        "_id": "622879ba186954419e9d892b",
+        "name": "sh",
+        "email": "sh@mail.com",
+        "role": "operator",
+        "__v": 0,
+        "password": "1234"
+    },
+    {
+        "_id": "62296648c3ce03faae3f3b23",
+        "name": "sh1",
+        "email": "sh1@mail.com",
+        "role": "user",
+        "__v": 0,
+        "password": "1234"
+    },
+    {
+        "_id": "622981117f89f3e1c1f3ccfd",
+        "name": "sh2",
+        "email": "sh2@mail.com",
+        "role": "admin",
+        "__v": 0,
+        "password": "1234"
+    }
+]
